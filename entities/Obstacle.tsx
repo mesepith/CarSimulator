@@ -8,7 +8,7 @@ interface ObstacleProps {
   color: string;
 }
 
-const Obstacle = (position: { x: number; y: number }, size: { width: number; height: number } = { width: 50, height: 50 }, color: string = 'red') => {
+const Obstacle = (position: { x: number; y: number }, size: { width: number, height: number } = { width: 50, height: 50 }, color: string = 'red') => {
   return {
     position,
     size,
@@ -26,7 +26,7 @@ const Rectangle: React.FC<ObstacleProps> = ({ position, size, color }) => {
         top: position.y,
         width: size.width,
         height: size.height,
-        backgroundColor: color,
+        backgroundColor: color, // This should now reflect the updated color
       }}
     />
   );
