@@ -1,39 +1,47 @@
-import React from 'react';
+// components/GameEngine.tsx
+import React, { useState, useEffect } from 'react';
 import { GameEngine } from 'react-native-game-engine';
 import Car from '../entities/Car';
-import Obstacle from '../entities/Obstacle';
 import MoveSystem from '../systems/MoveSystem';
 import TouchControlSystem from '../systems/TouchControlSystem';
 import CollisionSystem from '../systems/CollisionSystem';
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../utils/Constants';
-
-// Function to generate random obstacles
-const generateObstacles = (numberOfObstacles: number) => {
-  let obstacles = {};
-  for (let i = 0; i < numberOfObstacles; i++) {
-    // Random positions for the obstacles
-    const position = {
-      x: Math.random() * (SCREEN_WIDTH - 50), // Assuming obstacle width is 50
-      y: Math.random() * SCREEN_HEIGHT,
-    };
-
-    // Add the obstacle entity to the obstacles object with random size and position
-    obstacles[`obstacle_${i}`] = Obstacle(position, { width: 50, height: 50 }, 'red');
-  }
-  return obstacles;
-};
+import { SCREEN_WIDTH, SCREEN_HEIGHT, RIDE_DURATION, CAR_START_POSITION, CAR_VELOCITY } from '../utils/Constants';
+import { generateObstacles } from '../utils/GameUtils';
 
 const GameEngineApp: React.FC = () => {
-  // Generate a set number of obstacles, e.g., 5
-  const obstacles = generateObstacles(5);
+  const [timeElapsed, setTimeElapsed] = useState(0);
+  const [entities, setEntities] = useState({
+    car: Car(CAR_START_POSITION, { width: 50, height: 100 }, 'blue'),
+    ...generateObstacles(5),
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeElapsed(prevTime => prevTime + 1000); // Update time every second
+    }, 1000);
+
+    if (timeElapsed >= RIDE_DURATION) {
+      setTimeElapsed(0);
+      // Reset the car's position and update the entities state
+      setEntities(prevEntities => ({
+        ...prevEntities,
+        car: Car(CAR_START_POSITION, { width: 50, height: 100 }, 'blue'),
+      }));
+    }
+
+    return () => clearInterval(timer);
+  }, [timeElapsed]);
 
   return (
     <GameEngine
-      style={{ flex: 1, backgroundColor: '#fff' }}
-      systems={[MoveSystem, TouchControlSystem, CollisionSystem]} // Include all the systems you want to use
+      systems={[
+        MoveSystem(generateObstacles), // Pass generateObstacles as an argument
+        TouchControlSystem,
+        CollisionSystem
+      ]}
       entities={{
-        car: Car({ x: SCREEN_WIDTH / 2 - 25, y: SCREEN_HEIGHT - 110 }, { width: 50, height: 100 }, 'blue'), // Initialize the car entity with starting position, size, and color
-        ...obstacles, // Spread the generated obstacles into the entities object
+        car: Car(CAR_START_POSITION, { width: 50, height: 100 }, 'blue'),
+        ...generateObstacles(5),
       }}>
       {/* Game view goes here */}
     </GameEngine>

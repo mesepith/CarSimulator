@@ -15,4 +15,7 @@ export const CAR_START_POSITION: {x: number, y: number} = {
 // Set the car's velocity to move upwards. Adjust the value as needed for speed.
 export const CAR_VELOCITY: {x: number, y: number} = { x: 0, y: -0.1 };
 
+// In utils/Constants.ts
+export const RIDE_DURATION = 7000; // 30 seconds in milliseconds
+
 // You can add more constants here as your game develops
